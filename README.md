@@ -1,6 +1,6 @@
 # Berlin Bus Network Analyzer 🚌
 
-[![GitHub license](https://img.shields.io/github/license/anubhab1601/berlin-bus-analyzer)](LICENSE)
+[![GitHub license]([https://img.shields.io/github/license/anubhab1601/berlin-bus-analyzer](https://github.com/anubhab1601/Dijkstra-Berlin-Bus/blob/main/LICENSE))](LICENSE)
 [![C](https://img.shields.io/badge/language-C-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
 
 A C program that analyzes the Berlin bus network using Dijkstra's algorithm to find shortest paths between nodes in the transportation network.
