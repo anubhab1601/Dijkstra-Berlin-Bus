@@ -218,85 +218,111 @@ void printPathToFile(FILE *file, int node) {
     fprintf(file, "%d", node);
 }
 
-void writeOutputCSV(int startNode, int trial) {
-    FILE *output_file = fopen("output.csv", trial == 1 ? "w" : "a");
-    if (!output_file) {
-        printf("Error opening output file\n");
-        exit(0);
-    }
+// void writeOutputCSV(int startNode, int trial) {
+//     FILE *output_file = fopen("output.csv", trial == 1 ? "w" : "a");
+//     if (!output_file) {
+//         printf("Error opening output file\n");
+//         exit(0);
+//     }
 
-    if (trial == 1) {
-        fprintf(output_file, "start node,trial,distance,parent\n");
-    }
+//     if (trial == 1) {
+//         fprintf(output_file, "start node,trial,distance,parent\n");
+//     }
+
+//     for (int i = 0; i < numNodes; i++) {
+//         int node = nodes[i];
+//         if (node == startNode) continue;
+
+//         // Build distance string
+//         char dist_str[1024] = "{";
+//         int current = node;
+//         int count = 0;
+//         int distances[MAX_NODES];
+        
+//         // Get distances in reverse order
+//         while (current != startNode && current != -1 && count < MAX_NODES) {
+//             distances[count++] = path_distances[trial-1][current];
+//             current = path_parents[trial-1][current];
+//         }
+//         distances[count++] = 0; // Start node distance
+        
+//         // Add distances in correct order
+//         for (int j = count-1; j >= 0; j--) {
+//             char temp[20];
+//             if (j == count-1) {
+//                 sprintf(temp, "%d", distances[j]);
+//             } else {
+//                 sprintf(temp, ", %d", distances[j]);
+//             }
+//             strcat(dist_str, temp);
+//         }
+//         strcat(dist_str, "}");
+
+//         // Build parent string
+//         char parent_str[1024] = "{";
+//         current = node;
+//         count = 0;
+//         int parents[MAX_NODES];
+        
+//         // Get parents in reverse order
+//         while (current != startNode && current != -1 && count < MAX_NODES) {
+//             parents[count++] = path_parents[trial-1][current];
+//             current = path_parents[trial-1][current];
+//         }
+//         parents[count++] = -1; // Start node has no parent
+        
+//         // Add parents in correct order
+//         for (int j = count-1; j >= 0; j--) {
+//             char temp[50];
+//             if (j == count-1) {
+//                 if (parents[j] == -1) {
+//                     sprintf(temp, "[]");
+//                 } else {
+//                     sprintf(temp, "[%d]", parents[j]);
+//                 }
+//             } else {
+//                 if (parents[j] == -1) {
+//                     sprintf(temp, ", []");
+//                 } else {
+//                     sprintf(temp, ", [%d]", parents[j]);
+//                 }
+//             }
+//             strcat(parent_str, temp);
+//         }
+//         strcat(parent_str, "}");
+
+//         // Write to file (using simple trial number)
+//         fprintf(output_file, "%d,%d,\"%s\",\"%s\"\n", 
+//                 startNode, trial, dist_str, parent_str);
+//     }
+
+//     fclose(output_file);
+// }
+
+void writeOutputCSV(int startNode, int trial) {
+    FILE *file = fopen("output.csv", trial == 1 ? "w" : "a");
+    if (!file) { printf("Error opening file\n"); exit(1); }
+
+    if (trial == 1) fprintf(file, "start node,trial,distance,parent\n");
 
     for (int i = 0; i < numNodes; i++) {
         int node = nodes[i];
         if (node == startNode) continue;
 
-        // Build distance string
-        char dist_str[1024] = "{";
+        char dist[1024] = "{0", parents[1024] = "{[]";
         int current = node;
-        int count = 0;
-        int distances[MAX_NODES];
         
-        // Get distances in reverse order
-        while (current != startNode && current != -1 && count < MAX_NODES) {
-            distances[count++] = path_distances[trial-1][current];
+        while (current != startNode && current != -1) {
+            sprintf(dist + strlen(dist), ", %d", path_distances[trial-1][current]);
+            sprintf(parents + strlen(parents), ", [%d]", path_parents[trial-1][current]);
             current = path_parents[trial-1][current];
         }
-        distances[count++] = 0; // Start node distance
         
-        // Add distances in correct order
-        for (int j = count-1; j >= 0; j--) {
-            char temp[20];
-            if (j == count-1) {
-                sprintf(temp, "%d", distances[j]);
-            } else {
-                sprintf(temp, ", %d", distances[j]);
-            }
-            strcat(dist_str, temp);
-        }
-        strcat(dist_str, "}");
-
-        // Build parent string
-        char parent_str[1024] = "{";
-        current = node;
-        count = 0;
-        int parents[MAX_NODES];
-        
-        // Get parents in reverse order
-        while (current != startNode && current != -1 && count < MAX_NODES) {
-            parents[count++] = path_parents[trial-1][current];
-            current = path_parents[trial-1][current];
-        }
-        parents[count++] = -1; // Start node has no parent
-        
-        // Add parents in correct order
-        for (int j = count-1; j >= 0; j--) {
-            char temp[50];
-            if (j == count-1) {
-                if (parents[j] == -1) {
-                    sprintf(temp, "[]");
-                } else {
-                    sprintf(temp, "[%d]", parents[j]);
-                }
-            } else {
-                if (parents[j] == -1) {
-                    sprintf(temp, ", []");
-                } else {
-                    sprintf(temp, ", [%d]", parents[j]);
-                }
-            }
-            strcat(parent_str, temp);
-        }
-        strcat(parent_str, "}");
-
-        // Write to file (using simple trial number)
-        fprintf(output_file, "%d,%d,\"%s\",\"%s\"\n", 
-                startNode, trial, dist_str, parent_str);
+        strcat(dist, "}");
+        strcat(parents, "}");
+        fprintf(file, "%d,%d,\"%s\",\"%s\"\n", startNode, trial, dist, parents);
     }
-
-    fclose(output_file);
+    fclose(file);
 }
 
 void dijkstra(int startNode, int trial) {
